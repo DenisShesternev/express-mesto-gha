@@ -10,10 +10,10 @@ const {
 
 const usersRouter = Router();
 
-usersRouter.get('/users', getUsers);
-usersRouter.get('/users/:userId', getUser);
-usersRouter.post('/users', createUser);
-usersRouter.patch('/users/me', updateUser);
-usersRouter.patch('/users/me/avatar', updateAvatar);
+usersRouter.get('/', getUsers);
+usersRouter.get('/:userId', getUser);
+usersRouter.post('/', createUser);
+usersRouter.patch('/me', updateUser);
+usersRouter.patch('/me/avatar', updateAvatar);
 
 module.exports = usersRouter;
