@@ -17,7 +17,7 @@ const createCard = (req, res) => {
   return Cards.create({ name, link, owner })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки.' });
       } else {
         res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
@@ -31,7 +31,15 @@ const deleteCard = (req, res) => {
   return Cards.findByIdAndRemove(cardId)
     .orFail(() => new Error('NotFound'))
     .then((card) => res.status(200).send(card))
-    .catch(() => res.status(ERR_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена.' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки.' });
+      } else if (err.message === 'NotFound') {
+        res.status(ERR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
+      } else {
+        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+      }
+    });
 };
 
 const likeCard = (req, res) => {
