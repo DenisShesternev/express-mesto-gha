@@ -11,10 +11,20 @@ const getUsers = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  User.findById(req.params._id)
-    .orFail(() => res.status(ERR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' }))
+  const { userId } = req.params;
+
+  return User.findById(userId)
+    .orFail(() => new Error('NotFound'))
     .then((user) => res.status(200).send(user))
-    .catch(() => res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else if (err.message === 'NotFound') {
+        res.status(ERR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
+      } else {
+        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+      }
+    });
 };
 
 const createUser = (req, res) => {
@@ -36,11 +46,13 @@ const updateUser = (req, res) => {
   const userId = req.user._id;
 
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .orFail(() => res.status(ERR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' }))
-    .then((user) => res.send({ data: user }))
+    .orFail(() => new Error('NotFound'))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+      } else if (err.message === 'NotFound') {
+        res.status(ERR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
         res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
       }
@@ -53,7 +65,7 @@ const updateAvatar = (req, res) => {
 
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .orFail(() => res.status(ERR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' }))
-    .then((avatarData) => res.send({ data: avatarData }))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
