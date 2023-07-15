@@ -6,14 +6,14 @@ const ERR_NOT_FOUND = 404;
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((user) => res.status(200).send(user))
     .catch(() => res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' }));
 };
 
 const getUser = (req, res) => {
   User.findById(req.params._id)
     .orFail(() => res.status(ERR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' }))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch(() => res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' }));
 };
 
@@ -21,9 +21,9 @@ const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else {
         res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
