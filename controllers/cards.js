@@ -7,7 +7,7 @@ const ERR_NOT_FOUND = 404;
 const getCards = (req, res) => {
   Cards.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' }));
+    .catch(() => res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' }));
 };
 
 const createCard = (req, res) => {
@@ -20,7 +20,7 @@ const createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки.' });
       } else {
-        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+        res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' });
       }
     });
 };
@@ -37,7 +37,7 @@ const deleteCard = (req, res) => {
       } else if (err.message === 'NotFound') {
         res.status(ERR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
       } else {
-        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+        res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' });
       }
     });
 };
@@ -55,7 +55,7 @@ const likeCard = (req, res) => {
       } else if (err.message === 'NotFound') {
         res.status(ERR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
       } else {
-        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+        res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' });
       }
     });
 };
@@ -73,7 +73,7 @@ const dislikeCard = (req, res) => {
       } else if (err.message === 'NotFound') {
         res.status(ERR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
       } else {
-        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+        res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' });
       }
     });
 };

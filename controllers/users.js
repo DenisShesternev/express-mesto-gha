@@ -7,7 +7,7 @@ const ERR_NOT_FOUND = 404;
 const getUsers = (req, res) => {
   User.find({})
     .then((user) => res.status(200).send(user))
-    .catch(() => res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' }));
+    .catch(() => res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' }));
 };
 
 const getUser = (req, res) => {
@@ -22,7 +22,7 @@ const getUser = (req, res) => {
       } else if (err.message === 'NotFound') {
         res.status(ERR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
-        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+        res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' });
       }
     });
 };
@@ -36,7 +36,7 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else {
-        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+        res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' });
       }
     });
 };
@@ -54,7 +54,7 @@ const updateUser = (req, res) => {
       } else if (err.message === 'NotFound') {
         res.status(ERR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
-        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+        res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' });
       }
     });
 };
@@ -70,7 +70,7 @@ const updateAvatar = (req, res) => {
       if (err.name === 'CastError') {
         res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       } else {
-        res.status(ERR_DEFAULT).send({ message: 'Ошибка по умолчанию.' });
+        res.status(ERR_DEFAULT).send({ message: 'На сервере произошла ошибка.' });
       }
     });
 };
