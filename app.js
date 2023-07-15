@@ -1,4 +1,4 @@
-const express = require('express');
+const { express, router } = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/users');
@@ -9,7 +9,6 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   req.user = {
     _id: '64b20a1d368c2aaa822a77d3',
@@ -19,6 +18,11 @@ app.use((req, res, next) => {
 
 app.use(userRouter);
 app.use(cardsRouter);
+
+router.use('*', (req, res) => {
+  res.status(404).send({ message: 'Not Found' });
+});
+router.use(express.json());
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
