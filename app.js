@@ -1,7 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const router = require('./routes');
+const { errors } = require('celebrate');
+const routes = require('./routes');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const {
+  validationCreateUser,
+  validationLogin,
+} = require('./middlewares/validations');
+
+const handelError = require('./middlewares/handleError');
 
 const { PORT = 3000, MONGODB = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
@@ -9,14 +18,13 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64b20a1d368c2aaa822a77d3',
-  };
-  next();
-});
+app.post('/signin', validationLogin, login);
+app.post('/signup', validationCreateUser, createUser);
 
-app.use(router);
+app.use(auth);
+app.use(routes);
+app.use(errors());
+app.use(handelError);
 
 mongoose.connect(MONGODB);
 
