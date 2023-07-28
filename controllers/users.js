@@ -33,28 +33,28 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-
-  bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        name, about, avatar, email, password: hash,
-      });
+  bcrypt.hash(password, 10).then((hash) => {
+    User.create({
+      name, about, avatar, email, password: hash,
     })
-    .then(() => res.status(201).send(
-      {
-        data: {
-          name, about, avatar, email,
+      .then(() => res.status(201).send(
+        {
+          data: {
+            name, about, avatar, email,
+          },
         },
-      },
-    ))
-    .catch((err) => {
-      if (err.code === 11000) {
-        throw new ConflictError('Пользователь с таким email уже существует');
-      }
-      if (err.name === 'ValidationError') {
-        throw new BadReqError('Переданы некорректные данные при создании пользователя');
-      }
-    })
+      ))
+      // eslint-disable-next-line
+      .catch((err) => {
+        if (err.code === 11000) {
+          return next(new ConflictError('Пользователь с таким email уже существует'));
+        }
+        if (err.name === 'ValidationError') {
+          return next(new BadReqError('Некорректные данные'));
+        }
+        next(err);
+      });
+  })
     .catch(next);
 };
 
@@ -67,9 +67,10 @@ const updateUser = (req, res, next) => {
       throw new NotFound('Пользователь с указанным _id не найден');
     })
     .then((user) => res.status(200).send(user))
+    // eslint-disable-next-line
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadReqError('Переданы некорректные данные при обновлении профиля');
+        return next(new BadReqError('Переданы некорректные данные при обновлении профиля'));
       }
     })
     .catch(next);
@@ -84,9 +85,10 @@ const updateAvatar = (req, res, next) => {
       throw new NotFound('Пользователь с указанным _id не найден');
     })
     .then((user) => res.status(200).send(user))
+    // eslint-disable-next-line
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadReqError('Переданы некорректные данные при обновлении аватара');
+        return next(new BadReqError('Переданы некорректные данные при обновлении аватара'));
       }
     })
     .catch(next);
@@ -113,11 +115,12 @@ const getCurrentUser = (req, res, next) => {
       throw new NotFound('Пользователь не найден');
     })
     .then((user) => res.status(200).send({ user }))
+    // eslint-disable-next-line
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadReqError('Переданы некорректные данные');
-      } else if (err.message === 'NotFound') {
-        throw new NotFound('Пользователь не найден');
+        return next(new BadReqError('Переданы некорректные данные'));
+      } if (err.message === 'NotFound') {
+        return next(new NotFound('Пользователь не найден'));
       }
     })
     .catch(next);
