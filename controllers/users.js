@@ -31,20 +31,28 @@ const getUser = (req, res, next) => {
 
 const createUser = (req, res, next) => {
   const {
-    name, about, avatar, email,
+    name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(req.body.password, 10)
+
+  bcrypt.hash(password, 10)
     .then((hash) => {
       User.create({
         name, about, avatar, email, password: hash,
       });
     })
-    .then((user) => res.status(201).send(user))
+    .then(() => res.status(201).send(
+      {
+        data: {
+          name, about, avatar, email,
+        },
+      },
+    ))
     .catch((err) => {
+      if (err.code === 11000) {
+        throw new ConflictError('Пользователь с таким email уже существует');
+      }
       if (err.name === 'ValidationError') {
         throw new BadReqError('Переданы некорректные данные при создании пользователя');
-      } else if (err.code === 11000) {
-        throw new ConflictError('Пользователь с таким email уже существует');
       }
     })
     .catch(next);
