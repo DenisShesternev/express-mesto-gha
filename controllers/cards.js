@@ -17,7 +17,7 @@ const createCard = (req, res, next) => {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadReqError('Переданы некорректные данные при создании карточки');
+        next(new BadReqError('Переданы некорректные данные при создании карточки'));
       }
     })
     .catch(next);
@@ -34,7 +34,7 @@ const deleteCard = (req, res, next) => {
       if (card.owner.toString() === req.user._id) {
         Cards.findByIdAndRemove(cardId).then(() => res.status(200).send(card));
       } else {
-        throw new ForbiddenError('Отказано в доступе');
+        next(new ForbiddenError('Отказано в доступе'));
       }
     })
     .catch(next);

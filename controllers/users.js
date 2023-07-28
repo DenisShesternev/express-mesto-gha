@@ -44,13 +44,12 @@ const createUser = (req, res, next) => {
           },
         },
       ))
-      // eslint-disable-next-line
       .catch((err) => {
         if (err.code === 11000) {
-          return next(new ConflictError('Пользователь с таким email уже существует'));
+          next(new ConflictError('Пользователь с таким email уже существует'));
         }
         if (err.name === 'ValidationError') {
-          return next(new BadReqError('Некорректные данные'));
+          next(new BadReqError('Некорректные данные'));
         }
         next(err);
       });
@@ -67,10 +66,9 @@ const updateUser = (req, res, next) => {
       throw new NotFound('Пользователь с указанным _id не найден');
     })
     .then((user) => res.status(200).send(user))
-    // eslint-disable-next-line
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return next(new BadReqError('Переданы некорректные данные при обновлении профиля'));
+        next(new BadReqError('Переданы некорректные данные при обновлении профиля'));
       }
     })
     .catch(next);
@@ -85,10 +83,9 @@ const updateAvatar = (req, res, next) => {
       throw new NotFound('Пользователь с указанным _id не найден');
     })
     .then((user) => res.status(200).send(user))
-    // eslint-disable-next-line
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return next(new BadReqError('Переданы некорректные данные при обновлении аватара'));
+        next(new BadReqError('Переданы некорректные данные при обновлении аватара'));
       }
     })
     .catch(next);
@@ -115,12 +112,11 @@ const getCurrentUser = (req, res, next) => {
       throw new NotFound('Пользователь не найден');
     })
     .then((user) => res.status(200).send({ user }))
-    // eslint-disable-next-line
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadReqError('Переданы некорректные данные'));
-      } if (err.message === 'NotFound') {
-        return next(new NotFound('Пользователь не найден'));
+        next(new BadReqError('Переданы некорректные данные'));
+      } else if (err.message === 'NotFound') {
+        next(new NotFound('Пользователь не найден'));
       }
     })
     .catch(next);
