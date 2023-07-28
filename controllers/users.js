@@ -47,13 +47,15 @@ const createUser = (req, res, next) => {
         },
       },
     ))
+    // eslint-disable-next-line
     .catch((err) => {
       if (err.code === 11000) {
-        throw new ConflictError('Пользователь с таким email уже существует');
+        return next(new ConflictError('Пользователь с таким email уже существует'));
       }
       if (err.name === 'ValidationError') {
-        throw new BadReqError('Переданы некорректные данные при создании пользователя');
+        return next(new BadReqError('Некорректные данные'));
       }
+      next(err);
     })
     .catch(next);
 };
