@@ -26,6 +26,7 @@ const getUser = (req, res, next) => {
       if (err.message === 'NotFound') {
         next(new NotFound('Пользователь с указанным _id не найден.'));
       }
+      next(err);
     });
 };
 
@@ -108,19 +109,18 @@ const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
 
   User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        throw new NotFound('Пользователь с таким id не найден');
-      }
-      res.send({ data: user });
+    .orFail(() => {
+      throw new NotFound('Пользователь не найден');
     })
+    .then((user) => res.status(200).send({ user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadReqError('Передан некорретный Id'));
-        return;
+        next(new BadReqError('Переданы некорректные данные'));
+      } if (err.message === 'NotFound') {
+        next(new NotFound('Пользователь не найден'));
       }
-      next(err);
-    });
+    })
+    .catch(next);
 };
 
 module.exports = {
