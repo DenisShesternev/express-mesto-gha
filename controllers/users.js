@@ -115,8 +115,6 @@ const getCurrentUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadReqError('Переданы некорректные данные'));
-      } else if (err.message === 'NotFound') {
-        next(new NotFound('Пользователь не найден'));
       }
     })
     .catch(next);
