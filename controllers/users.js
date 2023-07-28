@@ -31,31 +31,21 @@ const getUser = (req, res, next) => {
 
 const createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    name, about, avatar, email,
   } = req.body;
-
-  bcrypt.hash(password, 10)
+  bcrypt.hash(req.body.password, 10)
     .then((hash) => {
       User.create({
         name, about, avatar, email, password: hash,
       });
     })
-    .then(() => res.status(201).send(
-      {
-        data: {
-          name, about, avatar, email,
-        },
-      },
-    ))
-    // eslint-disable-next-line
+    .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.code === 11000) {
-        return next(new ConflictError('Пользователь с таким email уже существует'));
-      }
       if (err.name === 'ValidationError') {
-        return next(new BadReqError('Некорректные данные'));
+        throw new BadReqError('Переданы некорректные данные при создании пользователя');
+      } else if (err.code === 11000) {
+        throw new ConflictError('Пользователь с таким email уже существует');
       }
-      next(err);
     })
     .catch(next);
 };
