@@ -8,7 +8,7 @@ const validationUrl = (url) => {
     return url;
   }
 
-  throw new BadReqError('Некорректный адрес URL');
+  throw new BadReqError('Некорректный адрес URL.');
 };
 
 const validationID = (id) => {
